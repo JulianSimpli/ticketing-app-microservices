@@ -1,14 +1,21 @@
-FROM node:alpine
-
-RUN npm install -g pnpm
+FROM node:alpine AS builder
 
 WORKDIR /app
 
-COPY package.json ./
-COPY pnpm-lock.yaml ./
-
-RUN pnpm install
+COPY package.json pnpm-lock.yaml ./
+RUN npm install -g pnpm && pnpm install
 
 COPY . .
+RUN pnpm run build
 
-CMD ["pnpm", "dev"]
+# ---- Prod ----
+FROM node:alpine
+
+WORKDIR /app
+
+COPY package.json pnpm-lock.yaml ./
+RUN npm install -g pnpm && pnpm install --prod
+
+COPY --from=builder /app/dist ./dist
+
+CMD ["node", "dist/index.js"]
