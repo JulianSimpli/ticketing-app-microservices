@@ -17,3 +17,10 @@ spec:
                 name: auth-srv # name of the service that we want to send the request to
                 port:
                   number: 3000
+          - path: /?(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: client-srv
+                port:
+                  number: 3000

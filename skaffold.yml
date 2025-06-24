@@ -19,3 +19,11 @@ build:
         manual:
           - src: 'src/**/*.ts'
             dest: . # where to sync this file to inside of our running container
+    - image: simplijulian/ticketing-ms-client
+      context: client
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: '**/*.js'
+            dest: .
