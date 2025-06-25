@@ -8,12 +8,9 @@ importers:
 
   .:
     dependencies:
-      '@types/cookie-session':
-        specifier: ^2.0.49
-        version: 2.0.49
-      '@types/jsonwebtoken':
-        specifier: ^9.0.10
-        version: 9.0.10
+      '@js-ticketing-ms/common':
+        specifier: ^1.0.6
+        version: 1.0.6
       cookie-session:
         specifier: ^2.1.0
         version: 2.1.0
@@ -30,12 +27,18 @@ importers:
         specifier: ^8.16.0
         version: 8.16.0
     devDependencies:
+      '@types/cookie-session':
+        specifier: ^2.0.49
+        version: 2.0.49
       '@types/express':
         specifier: ^5.0.3
         version: 5.0.3
       '@types/jest':
         specifier: ^30.0.0
         version: 30.0.0
+      '@types/jsonwebtoken':
+        specifier: ^9.0.10
+        version: 9.0.10
       '@types/node':
         specifier: ^24.0.3
         version: 24.0.3
@@ -355,6 +358,9 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.9':
     resolution: {integrity: sha512-3Belt6tdc8bPgAtbcmdtNJlirVoTmEb5e2gC94PnkwEW9jI6CAHUeoG85tjWP5WquqfavoMtMwiG4P926ZKKuQ==}
+
+  '@js-ticketing-ms/common@1.0.6':
+    resolution: {integrity: sha512-X1+OdOOcRCXykMqNIKXy3zU9zQlNkEuTlQGWsn+pnVtM3CzsHSImFyt1mSI4Ud2Hb2hDo1cutzdQaXX4yeh/Vw==}
 
   '@mongodb-js/saslprep@1.3.0':
     resolution: {integrity: sha512-zlayKCsIjYb7/IdfqxorK5+xUMyi4vOKcFy10wKJYc63NSdKI8mNME+uJqfatkPmOSMMUiojrL58IePKBm3gvQ==}
@@ -2571,6 +2577,18 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.0
+
+  '@js-ticketing-ms/common@1.0.6':
+    dependencies:
+      '@types/cookie-session': 2.0.49
+      '@types/express': 5.0.3
+      '@types/jsonwebtoken': 9.0.10
+      cookie-session: 2.1.0
+      express: 5.1.0
+      express-validator: 7.2.1
+      jsonwebtoken: 9.0.2
+    transitivePeerDependencies:
+      - supports-color
 
   '@mongodb-js/saslprep@1.3.0':
     dependencies:
