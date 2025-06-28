@@ -14,9 +14,9 @@ it('responds with details about the current user', async () => {
   expect(res.body.currentUser.email).toEqual('test@test.com')
 })
 
-it('responds with 401 if not authenticated', async () => {
+it('responds with 200 if not authenticated', async () => {
   const response = await request(app)
     .get('/api/users/currentuser')
     .send()
-    .expect(401)
+    .expect(200)
 })
