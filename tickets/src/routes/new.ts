@@ -1,7 +1,7 @@
 import { Request, Response, Router } from 'express'
 import { body } from 'express-validator'
+import { requireAuth, validateRequest } from '@js-ticketing-ms/common/middlewares'
 
-import { requireAuth, validateRequest } from '@js-ticketing-ms/common'
 import { Ticket } from '../models/ticket'
 
 const validateCreateTicket = [

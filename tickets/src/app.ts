@@ -1,11 +1,8 @@
 import express from 'express'
 import cookieSession from 'cookie-session'
 
-import {
-  currentUser,
-  errorHandler,
-  NotFoundError,
-} from '@js-ticketing-ms/common'
+import { NotFoundError } from '@js-ticketing-ms/common/errors'
+import { currentUser, errorHandler } from '@js-ticketing-ms/common/middlewares'
 
 import { createTicketRouter } from './routes/new'
 import { getTicketsRouter } from './routes/show'

@@ -1,6 +1,5 @@
 import { Request, Response, Router } from 'express'
-
-import { NotFoundError } from '@js-ticketing-ms/common'
+import { NotFoundError } from '@js-ticketing-ms/common/errors'
 
 import { Ticket } from '../models/ticket'
 

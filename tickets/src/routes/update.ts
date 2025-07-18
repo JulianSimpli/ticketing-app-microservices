@@ -1,12 +1,8 @@
 import { Request, Response, Router } from 'express'
 import { body } from 'express-validator'
 
-import {
-  NotAuthorizedError,
-  NotFoundError,
-  requireAuth,
-  validateRequest,
-} from '@js-ticketing-ms/common'
+import { NotAuthorizedError, NotFoundError } from '@js-ticketing-ms/common/errors'
+import { requireAuth, validateRequest } from '@js-ticketing-ms/common/middlewares'
 
 import { Ticket } from '../models/ticket'
 
