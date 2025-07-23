@@ -1,5 +1,5 @@
 import { connect } from 'nats'
-import { Subjects, Streams } from './events/subjects'
+import { Streams } from './events/subjects'
 
 async function setup() {
   const client = await connect({ servers: 'http://localhost:4222' })
@@ -18,9 +18,9 @@ async function setup() {
   try {
     await jsm.streams.add({
       name: Streams.Tickets,
-      subjects: [Subjects.TicketCreated],
+      subjects: ['ticket.*'], // <-- acepta ticket.created y ticket.updated
     })
-    console.log('Stream "TICKETS" created for subject:', Subjects.TicketCreated)
+    console.log('Stream "TICKETS" creado para subjects: ticket.*')
   } catch (err) {
     console.error('Error creating stream:', err)
   }

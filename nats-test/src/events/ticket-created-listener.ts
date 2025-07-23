@@ -14,5 +14,6 @@ export class TicketCreatedListener extends JetStreamListener<TicketCreatedEvent>
   protected async onMessage(data: TicketCreatedEvent['data'], msg: JsMsg) {
     console.log(`Received:`, data)
     console.log(`Processing message #${msg.seq}: ${msg.string()}`)
+    msg.ack()
   }
 }
