@@ -4,8 +4,6 @@ import { body } from 'express-validator'
 import { NotAuthorizedError, NotFoundError } from '@js-ticketing-ms/common/errors'
 import { requireAuth, validateRequest } from '@js-ticketing-ms/common/middlewares'
 
-import { Ticket } from '../models/ticket'
-import { TicketUpdatedPublisher } from '../events/publishers/ticket-updated-publisher'
 import { natsClient } from '../nats-wrapper'
 
 const validateUpdateTicket = [
@@ -17,37 +15,37 @@ const validateUpdateTicket = [
 
 const router = Router()
 
-router.put(
-  '/api/tickets/:id',
-  requireAuth,
-  validateUpdateTicket,
-  validateRequest,
-  async (req: Request, res: Response) => {
-    const ticket = await Ticket.findById(req.params.id)
-    if (!ticket) {
-      throw new NotFoundError()
-    }
+// router.put(
+//   '/api/tickets/:id',
+//   requireAuth,
+//   validateUpdateTicket,
+//   validateRequest,
+//   async (req: Request, res: Response) => {
+//     const ticket = await Ticket.findById(req.params.id)
+//     if (!ticket) {
+//       throw new NotFoundError()
+//     }
 
-    if (ticket.userId !== req.currentUser!.id) {
-      throw new NotAuthorizedError()
-    }
+//     if (ticket.userId !== req.currentUser!.id) {
+//       throw new NotAuthorizedError()
+//     }
 
-    ticket.set({
-      title: req.body.title,
-      price: req.body.price,
-    })
+//     ticket.set({
+//       title: req.body.title,
+//       price: req.body.price,
+//     })
 
-    await ticket.save()
+//     await ticket.save()
 
-    await new TicketUpdatedPublisher(natsClient.client).publish({
-      id: ticket.id,
-      title: ticket.title,
-      price: ticket.price,
-      userId: ticket.userId,
-    })
+//     await new TicketUpdatedPublisher(natsClient.client).publish({
+//       id: ticket.id,
+//       title: ticket.title,
+//       price: ticket.price,
+//       userId: ticket.userId,
+//     })
 
-    res.status(200).send(ticket)
-  }
-)
+//     res.status(200).send(ticket)
+//   }
+// )
 
 export { router as updateTicketRouter }

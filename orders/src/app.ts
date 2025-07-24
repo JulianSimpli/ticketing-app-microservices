@@ -4,9 +4,9 @@ import cookieSession from 'cookie-session'
 import { NotFoundError } from '@js-ticketing-ms/common/errors'
 import { currentUser, errorHandler } from '@js-ticketing-ms/common/middlewares'
 
-import { createTicketRouter } from './routes/new'
-import { getTicketsRouter } from './routes/show'
-import { updateTicketRouter } from './routes/update'
+import { deleteOrderRouter } from './routes/delete'
+import { getOrdersRouter } from './routes/show'
+import { newOrderRouter } from './routes/new'
 
 const app = express()
 // config for our ingress nginx proxy service
@@ -24,9 +24,9 @@ app.use(
 
 app.use(currentUser)
 
-app.use(createTicketRouter)
-app.use(getTicketsRouter)
-app.use(updateTicketRouter)
+app.use(getOrdersRouter)
+app.use(deleteOrderRouter)
+app.use(newOrderRouter)
 
 app.use((req, res) => {
   throw new NotFoundError()

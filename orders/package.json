@@ -1,5 +1,5 @@
 {
-  "name": "tickets",
+  "name": "orders",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -19,7 +19,7 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-    "@js-ticketing-ms/common": "^1.0.9",
+    "@js-ticketing-ms/common": "^1.0.11",
     "cookie-session": "^2.1.0",
     "express": "^5.1.0",
     "express-validator": "^7.2.1",

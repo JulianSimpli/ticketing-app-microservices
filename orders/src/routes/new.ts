@@ -1,37 +1,60 @@
 import { Request, Response, Router } from 'express'
 import { body } from 'express-validator'
+
 import { requireAuth, validateRequest } from '@js-ticketing-ms/common/middlewares'
 
+import { BadRequestError, NotFoundError } from '@js-ticketing-ms/common/errors'
 import { Ticket } from '../models/ticket'
-import { TicketCreatedPublisher } from '../events/publishers/ticket-created-publisher'
-import { natsClient } from '../nats-wrapper'
+import { Order, OrderStatus } from '../models/order'
 
-const validateCreateTicket = [
-  body('title').isString().notEmpty().withMessage('Title must be valid'),
-  body('price').isFloat({ gt: 0 }).withMessage('Price must be greater than 0'),
+const EXPIRATION_WINDOW_SECONDS = 15 * 60
+
+const validateCreateOrder = [
+  body('ticketId')
+    .notEmpty()
+    .isMongoId() // if we are sure that the ticket id is always a mongo id
+    .withMessage('TicketId must be provided'),
 ]
 
 const router = Router()
 
 router.post(
-  '/api/tickets',
+  '/api/orders',
   requireAuth,
-  validateCreateTicket,
+  validateCreateOrder,
   validateRequest,
   async (req: Request, res: Response) => {
-    const { title, price } = req.body
+    const { ticketId } = req.body
 
-    const ticket = Ticket.build({ title, price, userId: req.currentUser!.id })
+    // find the ticket that the user is trying to order in the database
+    const ticket = await Ticket.findById(ticketId)
+    if (!ticket) {
+      throw new NotFoundError()
+    }
 
-    await ticket.save()
-    await new TicketCreatedPublisher(natsClient.client).publish({
-      id: ticket.id,
-      title: ticket.title,
-      price: ticket.price,
-      userId: ticket.userId,
+    // check if the ticket is already reserved
+    const isReserved = await ticket.isReserved()
+    if (isReserved) {
+      throw new BadRequestError('Ticket is already reserved')
+    }
+
+    // calculate an expiration date for this order
+    const expiration = new Date()
+    expiration.setSeconds(expiration.getSeconds() + EXPIRATION_WINDOW_SECONDS)
+
+    // build the order and save it to the database
+    const order = Order.build({
+      userId: req.currentUser!.id,
+      status: OrderStatus.Created,
+      expiresAt: expiration,
+      ticket: ticket,
     })
-    res.status(201).send(ticket)
+    await order.save()
+
+    // publish an event saying that an order was created
+
+    res.status(201).send(order)
   }
 )
 
-export { router as createTicketRouter }
+export { router as newOrderRouter }

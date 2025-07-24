@@ -3,13 +3,11 @@ import { Schema, model, Document, Model } from 'mongoose'
 interface TicketAttrs {
   title: string
   price: number
-  userId: string
 }
 
 interface TicketDoc extends Document {
   title: string
   price: number
-  userId: string
 }
 
 interface TicketModel extends Model<TicketDoc> {
@@ -20,7 +18,6 @@ const ticketSchema = new Schema<TicketDoc, TicketModel>(
   {
     title: { type: String, required: true },
     price: { type: Number, required: true },
-    userId: { type: String, required: true },
   },
   {
     toJSON: {

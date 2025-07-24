@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@js-ticketing-ms/common':
-        specifier: ^1.0.9
-        version: 1.0.9
+        specifier: ^1.0.11
+        version: 1.0.11
       cookie-session:
         specifier: ^2.1.0
         version: 2.1.1
@@ -361,8 +361,8 @@ packages:
   '@jridgewell/trace-mapping@0.3.9':
     resolution: {integrity: sha512-3Belt6tdc8bPgAtbcmdtNJlirVoTmEb5e2gC94PnkwEW9jI6CAHUeoG85tjWP5WquqfavoMtMwiG4P926ZKKuQ==}
 
-  '@js-ticketing-ms/common@1.0.9':
-    resolution: {integrity: sha512-Yb/QNr5aOhmc1T6GMuJUOFT8TM8/0TJ4600TU0R/hWmZEM2FWSTUtBpj8AtOm8yKhY0t3ZyhVpfmh7MWKEEWxQ==}
+  '@js-ticketing-ms/common@1.0.11':
+    resolution: {integrity: sha512-dwN5lV+SxO3eE1LJTxEeu1NxfC05Zac1o8iuthwUMuPmSsUooN6zjIRJrcpSo5yT3Sq3lqgXGEQ63V2ZczJv0w==}
 
   '@mongodb-js/saslprep@1.3.0':
     resolution: {integrity: sha512-zlayKCsIjYb7/IdfqxorK5+xUMyi4vOKcFy10wKJYc63NSdKI8mNME+uJqfatkPmOSMMUiojrL58IePKBm3gvQ==}
@@ -2613,7 +2613,7 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.4
 
-  '@js-ticketing-ms/common@1.0.9':
+  '@js-ticketing-ms/common@1.0.11':
     dependencies:
       '@types/cookie-session': 2.0.49
       '@types/express': 5.0.3

@@ -4,9 +4,32 @@ import { MongoMemoryServer } from 'mongodb-memory-server'
 import mongoose from 'mongoose'
 import jwt from 'jsonwebtoken'
 
-jest.mock('../nats-wrapper')
+declare global {
+  var signin: () => string[]
+}
+
+global.signin = () => {
+  // build a jwt payload {id, email}
+  const payload = {
+    id: new mongoose.Types.ObjectId().toHexString(),
+    email: 'test@asd.com',
+  }
+
+  // Create the JWT
+  const token = jwt.sign(payload, process.env.JWT_KEY!)
+
+  // Build session object { jwt: "token"}
+  const session = JSON.stringify({ jwt: token })
+
+  // Turn that session into JSON and encode it as base64
+  const base64 = Buffer.from(session).toString('base64')
+
+  return [`session=${base64}`]
+}
 
 let mongo: MongoMemoryServer
+
+jest.mock('../nats-wrapper')
 
 beforeAll(async () => {
   // set env vars
@@ -36,27 +59,3 @@ afterAll(async () => {
   }
   await mongoose.connection.close()
 })
-
-declare global {
-  var signin: () => string[]
-}
-
-global.signin = () => {
-  // build a jwt payload {id, email}
-  const payload = {
-    id: new mongoose.Types.ObjectId().toHexString(),
-    email: 'test@asd.com',
-  }
-
-  // Create the JWT
-  const token = jwt.sign(payload, process.env.JWT_KEY!)
-
-  // Build session object { jwt: "token"}
-  const session = JSON.stringify({ jwt: token })
-
-  // Turn that session into JSON
-  const base64 = Buffer.from(session).toString('base64')
-
-  // Take JSON and encode it as base64
-  return [`session=${base64}`]
-}
