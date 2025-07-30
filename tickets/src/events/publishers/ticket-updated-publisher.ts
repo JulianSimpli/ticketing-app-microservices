@@ -1,6 +1,5 @@
-import { JetStreamPublisher, Streams, Subjects, TicketUpdatedEvent } from '@js-ticketing-ms/common/events'
+import { Publisher, Subjects, TicketUpdatedEvent } from '@js-ticketing-ms/common';
 
-export class TicketUpdatedPublisher extends JetStreamPublisher<TicketUpdatedEvent> {
-    readonly subject = Subjects.TicketUpdated
-    stream = Streams.Tickets
+export class TicketUpdatedPublisher extends Publisher<TicketUpdatedEvent> {
+  subject: Subjects.TicketUpdated = Subjects.TicketUpdated;
 }

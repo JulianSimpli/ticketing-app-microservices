@@ -1,26 +1,28 @@
-import { Request, Response, Router } from 'express'
-import { NotAuthorizedError, NotFoundError } from '@js-ticketing-ms/common/errors'
-import { Order } from '../models/order'
-import { requireAuth } from '@js-ticketing-ms/common/middlewares'
+import express, { Request, Response } from 'express';
+import {
+  requireAuth,
+  NotFoundError,
+  NotAuthorizedError,
+} from '@js-ticketing-ms/common';
+import { Order } from '../models/order';
 
-const router = Router()
+const router = express.Router();
 
-router.get('/api/orders', requireAuth, async (req: Request, res: Response) => {
-  const orders = await Order.find({ userId: req.currentUser!.id }).populate(
-    'ticket'
-  )
-  res.send(orders)
-})
+router.get(
+  '/api/orders/:orderId',
+  requireAuth,
+  async (req: Request, res: Response) => {
+    const order = await Order.findById(req.params.orderId).populate('ticket');
 
-router.get('/api/orders/:orderId', requireAuth, async (req: Request, res: Response) => {
-  const order = await Order.findOne({
-    _id: req.params.orderId,
-    userId: req.currentUser!.id
-  }).populate('ticket')
-  if (!order) {
-    throw new NotFoundError()
+    if (!order) {
+      throw new NotFoundError();
+    }
+    if (order.userId !== req.currentUser!.id) {
+      throw new NotAuthorizedError();
+    }
+
+    res.send(order);
   }
-  res.send(order)
-})
+);
 
-export { router as getOrdersRouter }
+export { router as showOrderRouter };

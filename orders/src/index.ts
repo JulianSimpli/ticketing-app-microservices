@@ -1,56 +1,51 @@
-import mongoose from 'mongoose'
+import mongoose from 'mongoose';
 
-import { app } from './app'
-import { closeNatsClient, getNatsClient } from './nats-wrapper'
-import { retryAsync } from './utils/retry-async'
+import { app } from './app';
+import { natsWrapper } from './nats-wrapper';
+import { TicketCreatedListener } from './events/listeners/ticket-created-listener';
+import { TicketUpdatedListener } from './events/listeners/ticket-updated-listener';
 
 const start = async () => {
   if (!process.env.JWT_KEY) {
-    throw new Error('JWT_KEY must be defined')
+    throw new Error('JWT_KEY must be defined');
   }
-
   if (!process.env.MONGO_URI) {
-    throw new Error('MONGO_URI must be defined')
+    throw new Error('MONGO_URI must be defined');
   }
-
+  if (!process.env.NATS_CLIENT_ID) {
+    throw new Error('NATS_CLIENT_ID must be defined');
+  }
   if (!process.env.NATS_URL) {
-    throw new Error('NATS_URL must be defined')
+    throw new Error('NATS_URL must be defined');
+  }
+  if (!process.env.NATS_CLUSTER_ID) {
+    throw new Error('NATS_CLUSTER_ID must be defined');
   }
 
-  // Retry logic for NATS
   try {
-    await retryAsync(
-      getNatsClient,
-      10,
-      5000,
-      (err, attempt) => console.log(`NATS not available, retrying in 5s... Attempt ${attempt}`)
-    )
+    await natsWrapper.connect(
+      process.env.NATS_CLUSTER_ID,
+      process.env.NATS_CLIENT_ID,
+      process.env.NATS_URL
+    );
+    natsWrapper.client.on('close', () => {
+      console.log('NATS connection closed!');
+      process.exit();
+    });
+    process.on('SIGINT', () => natsWrapper.client.close());
+    process.on('SIGTERM', () => natsWrapper.client.close());
+
+    new TicketCreatedListener(natsWrapper.client).listen();
+    new TicketUpdatedListener(natsWrapper.client).listen();
+    await mongoose.connect(process.env.MONGO_URI);
+    console.log('Connected to MongoDb');
   } catch (err) {
-    console.error('Could not connect to NATS after several attempts, exiting.')
-    process.exit(1)
+    console.error(err);
   }
 
-  try {
-    await mongoose.connect(process.env.MONGO_URI.toString())
-    console.log('Connected to MongoDB')
+  app.listen(3000, () => {
+    console.log('Listening on port 3000!!!!!!!!');
+  });
+};
 
-    app.listen(3000, () => {
-      console.log('Listening Orders server on port 3000')
-    })
-  } catch (error) {
-    console.error('Failed to start server: ', error)
-    process.exit(1)
-  }
-}
-
-start()
-
-process.on('SIGINT', async () => {
-  await closeNatsClient();
-  process.exit(1);
-});
-
-process.on('SIGTERM', async () => {
-  await closeNatsClient();
-  process.exit(1);
-});
+start();

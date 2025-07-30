@@ -1,43 +1,33 @@
-import express from 'express'
-import cookieSession from 'cookie-session'
+import express from 'express';
+import 'express-async-errors';
+import { json } from 'body-parser';
+import cookieSession from 'cookie-session';
+import { errorHandler, NotFoundError, currentUser } from '@js-ticketing-ms/common';
+import { createTicketRouter } from './routes/new';
+import { showTicketRouter } from './routes/show';
+import { indexTicketRouter } from './routes/index';
+import { updateTicketRouter } from './routes/update';
 
-import { NotFoundError } from '@js-ticketing-ms/common/errors'
-import { currentUser, errorHandler } from '@js-ticketing-ms/common/middlewares'
-
-import { createTicketRouter } from './routes/new'
-import { getTicketsRouter } from './routes/show'
-import { updateTicketRouter } from './routes/update'
-
-const app = express()
-// config for our ingress nginx proxy service
-// req.ip will have real client info
-app.set('trust proxy', true)
-app.use(express.json())
-// will create req.session object
+const app = express();
+app.set('trust proxy', true);
+app.use(json());
 app.use(
   cookieSession({
     signed: false,
     secure: process.env.NODE_ENV !== 'test',
-    httpOnly: true,
   })
-)
+);
+app.use(currentUser as any);
 
-app.use(currentUser)
+app.use(createTicketRouter);
+app.use(showTicketRouter);
+app.use(indexTicketRouter);
+app.use(updateTicketRouter);
 
-app.use(createTicketRouter)
-app.use(getTicketsRouter)
-app.use(updateTicketRouter)
+app.all('*', async (req, res) => {
+  throw new NotFoundError();
+});
 
-// handling not found routes
-// Express 4
-// app.use((req, res, next) => {
-//   next(new NotFoundError())
-// })
-// Express 5
-app.use((req, res) => {
-  throw new NotFoundError()
-})
+app.use(errorHandler as any);
 
-app.use(errorHandler)
-
-export { app }
+export { app };

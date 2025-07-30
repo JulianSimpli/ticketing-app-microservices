@@ -1,37 +1,33 @@
-import express from 'express'
-import cookieSession from 'cookie-session'
+import express from 'express';
+import 'express-async-errors';
+import { json } from 'body-parser';
+import cookieSession from 'cookie-session';
+import { errorHandler, NotFoundError, currentUser } from '@js-ticketing-ms/common';
+import { deleteOrderRouter } from './routes/delete';
+import { indexOrderRouter } from './routes/index';
+import { newOrderRouter } from './routes/new';
+import { showOrderRouter } from './routes/show';
 
-import { NotFoundError } from '@js-ticketing-ms/common/errors'
-import { currentUser, errorHandler } from '@js-ticketing-ms/common/middlewares'
-
-import { deleteOrderRouter } from './routes/delete'
-import { getOrdersRouter } from './routes/show'
-import { newOrderRouter } from './routes/new'
-
-const app = express()
-// config for our ingress nginx proxy service
-// req.ip will have real client info
-app.set('trust proxy', true)
-app.use(express.json())
-// will create req.session object
+const app = express();
+app.set('trust proxy', true);
+app.use(json());
 app.use(
   cookieSession({
     signed: false,
     secure: process.env.NODE_ENV !== 'test',
-    httpOnly: true,
   })
-)
+);
+app.use(currentUser as any);
 
-app.use(currentUser)
+app.use(deleteOrderRouter);
+app.use(indexOrderRouter);
+app.use(newOrderRouter);
+app.use(showOrderRouter);
 
-app.use(getOrdersRouter)
-app.use(deleteOrderRouter)
-app.use(newOrderRouter)
+app.all('*', async (req, res) => {
+  throw new NotFoundError();
+});
 
-app.use((req, res) => {
-  throw new NotFoundError()
-})
+app.use(errorHandler as any);
 
-app.use(errorHandler)
-
-export { app }
+export { app };

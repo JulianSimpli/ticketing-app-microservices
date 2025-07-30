@@ -1,42 +1,33 @@
-import express from 'express'
-import cookieSession from 'cookie-session'
+import express from 'express';
+import 'express-async-errors';
+import { json } from 'body-parser';
+import cookieSession from 'cookie-session';
+import { errorHandler, NotFoundError } from '@js-ticketing-ms/common';
 
-import { errorHandler, NotFoundError } from '@js-ticketing-ms/common'
+import { currentUserRouter } from './routes/current-user';
+import { signinRouter } from './routes/signin';
+import { signoutRouter } from './routes/signout';
+import { signupRouter } from './routes/signup';
 
-import { currentUserRouter } from './routes/current-user'
-import { signinRouter } from './routes/signin'
-import { signoutRouter } from './routes/signout'
-import { signupRouter } from './routes/signup'
-
-const app = express()
-// config for our ingress nginx proxy service
-// req.ip will have real client info
-app.set('trust proxy', true)
-app.use(express.json())
-// will create req.session object
+const app = express();
+app.set('trust proxy', true);
+app.use(json());
 app.use(
   cookieSession({
     signed: false,
-    secure: process.env.NODE_ENV !== 'test',
-    httpOnly: true,
+    secure: process.env.NODE_ENV !== 'test'
   })
-)
+);
 
-app.use(currentUserRouter)
-app.use(signinRouter)
-app.use(signoutRouter)
-app.use(signupRouter)
+app.use(currentUserRouter);
+app.use(signinRouter);
+app.use(signoutRouter);
+app.use(signupRouter);
 
-// handling not found routes
-// Express 4
-// app.use((req, res, next) => {
-//   next(new NotFoundError())
-// })
-// Express 5
-app.use((req, res) => {
-  throw new NotFoundError()
-})
+app.all('*', async (req, res) => {
+  throw new NotFoundError();
+});
 
-app.use(errorHandler)
+app.use(errorHandler as any);
 
-export { app }
+export { app };

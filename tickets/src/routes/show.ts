@@ -1,21 +1,17 @@
-import { Request, Response, Router } from 'express'
-import { NotFoundError } from '@js-ticketing-ms/common/errors'
+import express, { Request, Response } from 'express';
+import { NotFoundError } from '@js-ticketing-ms/common';
+import { Ticket } from '../models/ticket';
 
-import { Ticket } from '../models/ticket'
-
-const router = Router()
-
-router.get('/api/tickets', async (req: Request, res: Response) => {
-  const tickets = await Ticket.find()
-  res.status(200).send(tickets)
-})
+const router = express.Router();
 
 router.get('/api/tickets/:id', async (req: Request, res: Response) => {
-  const ticket = await Ticket.findById(req.params.id)
-  if (!ticket) {
-    throw new NotFoundError()
-  }
-  res.status(200).send(ticket)
-})
+  const ticket = await Ticket.findById(req.params.id);
 
-export { router as getTicketsRouter }
+  if (!ticket) {
+    throw new NotFoundError();
+  }
+
+  res.send(ticket);
+});
+
+export { router as showTicketRouter };

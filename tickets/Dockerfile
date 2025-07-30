@@ -1,10 +1,8 @@
 FROM node:alpine
 
 WORKDIR /app
-
-COPY package.json pnpm-lock.yaml ./
-RUN npm install -g pnpm && pnpm install
-
+COPY package.json .
+RUN npm install --omit=dev
 COPY . .
 
-CMD ["pnpm", "dev"]
+CMD ["npm", "start"]

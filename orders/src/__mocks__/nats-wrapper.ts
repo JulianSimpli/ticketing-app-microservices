@@ -1,12 +1,11 @@
-export const natsClient = {
-    client: {
-        jetstreamManager: async () => ({
-            streams: {
-                info: async () => ({}), // simula que el stream existe
-            },
-        }),
-        jetstream: jest.fn().mockReturnValue({
-            publish: jest.fn().mockResolvedValue({ seq: 1 })
-        })
-    },
-}
+export const natsWrapper = {
+  client: {
+    publish: jest
+      .fn()
+      .mockImplementation(
+        (subject: string, data: string, callback: () => void) => {
+          callback();
+        }
+      ),
+  },
+};

@@ -1,60 +1,76 @@
-import { Request, Response, Router } from 'express'
-import { body } from 'express-validator'
+import mongoose from 'mongoose';
+import express, { Request, Response } from 'express';
+import {
+  requireAuth,
+  validateRequest,
+  NotFoundError,
+  OrderStatus,
+  BadRequestError
+} from '@js-ticketing-ms/common';
+import { body } from 'express-validator';
+import { Ticket } from '../models/ticket';
+import { Order } from '../models/order';
+import { OrderCreatedPublisher } from '../events/publishers/order-created-publisher';
+import { natsWrapper } from '../nats-wrapper';
 
-import { requireAuth, validateRequest } from '@js-ticketing-ms/common/middlewares'
+const router = express.Router();
 
-import { BadRequestError, NotFoundError } from '@js-ticketing-ms/common/errors'
-import { Ticket } from '../models/ticket'
-import { Order, OrderStatus } from '../models/order'
-
-const EXPIRATION_WINDOW_SECONDS = 15 * 60
-
-const validateCreateOrder = [
-  body('ticketId')
-    .notEmpty()
-    .isMongoId() // if we are sure that the ticket id is always a mongo id
-    .withMessage('TicketId must be provided'),
-]
-
-const router = Router()
+const EXPIRATION_WINDOW_SECONDS = 15 * 60;
 
 router.post(
   '/api/orders',
   requireAuth,
-  validateCreateOrder,
+  [
+    body('ticketId')
+      .not()
+      .isEmpty()
+      .custom((input: string) => mongoose.Types.ObjectId.isValid(input))
+      .withMessage('TicketId must be provided')
+  ],
   validateRequest,
   async (req: Request, res: Response) => {
-    const { ticketId } = req.body
+    const { ticketId } = req.body;
 
-    // find the ticket that the user is trying to order in the database
-    const ticket = await Ticket.findById(ticketId)
+    // Find the ticket the user is trying to order in the database
+    const ticket = await Ticket.findById(ticketId);
     if (!ticket) {
-      throw new NotFoundError()
+      throw new NotFoundError();
     }
 
-    // check if the ticket is already reserved
-    const isReserved = await ticket.isReserved()
+    // Make sure that this ticket is not already reserved
+    const isReserved = await ticket.isReserved();
     if (isReserved) {
-      throw new BadRequestError('Ticket is already reserved')
+      throw new BadRequestError('Ticket is already reserved');
     }
 
-    // calculate an expiration date for this order
-    const expiration = new Date()
-    expiration.setSeconds(expiration.getSeconds() + EXPIRATION_WINDOW_SECONDS)
+    // Calculate an expiration date for this order
+    const expiration = new Date();
+    expiration.setSeconds(expiration.getSeconds() + EXPIRATION_WINDOW_SECONDS);
 
-    // build the order and save it to the database
+    // Build the order and save it to the database
     const order = Order.build({
       userId: req.currentUser!.id,
       status: OrderStatus.Created,
       expiresAt: expiration,
-      ticket: ticket,
-    })
-    await order.save()
+      ticket
+    });
+    await order.save();
 
-    // publish an event saying that an order was created
+    // Publish an event saying that an order was created
+    new OrderCreatedPublisher(natsWrapper.client).publish({
+      id: order.id,
+      version: order.version,
+      status: order.status,
+      userId: order.userId,
+      expiresAt: order.expiresAt.toISOString(),
+      ticket: {
+        id: ticket.id,
+        price: ticket.price
+      }
+    });
 
-    res.status(201).send(order)
+    res.status(201).send(order);
   }
-)
+);
 
-export { router as newOrderRouter }
+export { router as newOrderRouter };

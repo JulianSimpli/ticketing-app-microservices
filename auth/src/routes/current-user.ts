@@ -1,11 +1,10 @@
-import express from 'express'
+import express from 'express';
+import { currentUser } from '@js-ticketing-ms/common';
 
-import { currentUser } from '@js-ticketing-ms/common'
-
-const router = express.Router()
+const router = express.Router();
 
 router.get('/api/users/currentuser', currentUser, (req, res) => {
-  res.send({ currentUser: req.currentUser })
-})
+  res.send({ currentUser: req.currentUser || null });
+});
 
-export { router as currentUserRouter }
+export { router as currentUserRouter };
