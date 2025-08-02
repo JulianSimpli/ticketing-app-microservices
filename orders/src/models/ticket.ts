@@ -12,10 +12,12 @@ export interface TicketDoc extends mongoose.Document {
   title: string;
   price: number;
   version: number;
+  // instance methods - operates on a single document data
   isReserved(): Promise<boolean>;
 }
 
 interface TicketModel extends mongoose.Model<TicketDoc> {
+  // static methods - operates on the model or create new documents
   build(attrs: TicketAttrs): TicketDoc;
   findByEvent(event: {
     id: string;

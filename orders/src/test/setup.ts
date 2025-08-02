@@ -12,7 +12,7 @@ beforeAll(async () => {
   process.env.JWT_KEY = 'asdfasdf';
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
-  const mongo = await MongoMemoryServer.create();
+  mongo = await MongoMemoryServer.create();
   const mongoUri = mongo.getUri();
 
   await mongoose.connect(mongoUri, {});
@@ -34,6 +34,12 @@ afterAll(async () => {
     await mongo.stop();
   }
   await mongoose.connection.close();
+
+  // Cleanup any remaining handles
+  jest.clearAllMocks();
+
+  // Force cleanup of any remaining timers
+  jest.useRealTimers();
 });
 
 global.signin = () => {

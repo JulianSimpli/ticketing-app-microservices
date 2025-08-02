@@ -1,5 +1,6 @@
 import { Message } from 'node-nats-streaming';
 import { Listener, OrderCreatedEvent, Subjects } from '@js-ticketing-ms/common';
+
 import { queueGroupName } from './queue-group-name';
 import { Ticket } from '../../models/ticket';
 import { TicketUpdatedPublisher } from '../publishers/ticket-updated-publisher';
