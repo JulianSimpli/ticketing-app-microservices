@@ -4,11 +4,44 @@ on:
   pull_request
 
 jobs:
-  build:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      auth: ${{ steps.changes.outputs.auth }}
+      orders: ${{ steps.changes.outputs.orders }}
+      payments: ${{ steps.changes.outputs.payments }}
+      tickets: ${{ steps.changes.outputs.tickets }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          filters: |
+            auth:
+              - 'auth/**'
+            orders:
+              - 'orders/**'
+            payments:
+              - 'payments/**'
+            tickets:
+              - 'tickets/**'
+
+  test:
+    needs: changes
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        service: [auth, orders, payments, tickets]
+        include:
+          - service: auth
+            changed: ${{ needs.changes.outputs.auth }}
+          - service: orders
+            changed: ${{ needs.changes.outputs.orders }}
+          - service: payments
+            changed: ${{ needs.changes.outputs.payments }}
+          - service: tickets
+            changed: ${{ needs.changes.outputs.tickets }}
     steps:
       - uses: actions/checkout@v4
-      - run: cd ${{ matrix.service }} && npm install && npm run test:ci
+      - name: Run tests if service changed
+        if: matrix.changed == 'true'
+        run: cd ${{ matrix.service }} && npm install && npm run test:ci
