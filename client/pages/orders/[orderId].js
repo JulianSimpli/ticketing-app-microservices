@@ -5,7 +5,7 @@ import { loadStripe } from "@stripe/stripe-js";
 import useRequest from "../../hooks/use-request"
 import Router from "next/router";
 
-const stripePromise = loadStripe('pk_test_51ReEI2GbGyJpWrHqhITk7AYdCw46dg8gdOq2xjmQ7dsYzDsp3bHbkNlcYlBmwoDDmggIQcrltWDC0Pju6VeNwa0b00gSzcDjBO');
+const stripePromise = loadStripe('pk_test_asd');
 
 const CheckoutForm = ({ order, currentUser, doRequest, errors }) => {
   const stripe = useStripe();

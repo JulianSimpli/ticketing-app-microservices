@@ -2,12 +2,12 @@ import mongoose from 'mongoose';
 
 interface PaymentAttrs {
   orderId: string;
-  stripeChargeId: string;
+  paymentIntentId: string;
 }
 
 interface PaymentDoc extends mongoose.Document, PaymentAttrs {
   orderId: string;
-  stripeChargeId: string;
+  paymentIntentId: string;
 }
 
 interface PaymentModel extends mongoose.Model<PaymentDoc> {
@@ -16,7 +16,7 @@ interface PaymentModel extends mongoose.Model<PaymentDoc> {
 
 const paymentSchema = new mongoose.Schema({
   orderId: { type: String, required: true },
-  stripeChargeId: { type: String, required: true },
+  paymentIntentId: { type: String, required: true },
 }, {
   toJSON: {
     transform(doc, ret: any) {

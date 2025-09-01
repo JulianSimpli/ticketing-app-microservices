@@ -46,14 +46,14 @@ router.post('/api/payments', requireAuth, validation, validateRequest, async (re
 
     const payment = Payment.build({
       orderId,
-      stripeChargeId: paymentIntent.id,
+      paymentIntentId: paymentIntent.id,
     });
     await payment.save();
 
     await new PaymentCreatedPublisher(natsWrapper.client).publish({
       id: payment.id,
       orderId: payment.orderId,
-      stripeId: payment.stripeChargeId,
+      stripeId: payment.paymentIntentId,
     });
 
     res.status(201).send({ id: payment.id });
