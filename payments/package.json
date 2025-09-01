@@ -29,9 +29,9 @@
     "mongoose": "^8.6.3",
     "mongoose-update-if-current": "^1.4.0",
     "node-nats-streaming": "^0.3.2",
+    "stripe": "^18.5.0",
     "ts-node-dev": "^2.0.0",
-    "typescript": "^5.5.4",
-    "stripe": "^8.49.0"
+    "typescript": "^5.5.4"
   },
   "devDependencies": {
     "@types/jest": "^29.5.13",

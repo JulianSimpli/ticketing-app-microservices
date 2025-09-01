@@ -47,8 +47,8 @@ const orderSchema = new mongoose.Schema({
   },
 });
 
-orderSchema.set('versionKey', 'version');
-orderSchema.plugin(updateIfCurrentPlugin);
+orderSchema.set('versionKey', 'version'); // override mongoose and tell it to not use __v flag
+orderSchema.plugin(updateIfCurrentPlugin); // wire plugin
 
 orderSchema.statics.build = (attrs: OrderAttrs) => {
   return new Order({

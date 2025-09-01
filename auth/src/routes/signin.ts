@@ -46,6 +46,11 @@ router.post(
     );
 
     // Store it on session object
+    // el middleware cookie-session automáticamente:
+    // Serializa el objeto de sesión a JSON
+    // Codifica el JSON en base64
+    // Crea una cookie con el nombre session y el valor codificado
+    // Envía la cookie en la respuesta HTTP
     req.session = {
       jwt: userJwt
     };

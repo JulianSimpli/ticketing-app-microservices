@@ -21,8 +21,7 @@ const setup = async () => {
     },
   };
 
-  // @ts-ignore
-  const msg: Message = {
+  const msg: Partial<Message> = {
     ack: jest.fn(),
   };
 
@@ -32,7 +31,7 @@ const setup = async () => {
 it('should listen to order created events and create an order', async () => {
   const { listener, data, msg } = await setup();
 
-  await listener.onMessage(data, msg);
+  await listener.onMessage(data, msg as Message);
 
   const order = await Order.findById(data.id);
   expect(order).toBeDefined();

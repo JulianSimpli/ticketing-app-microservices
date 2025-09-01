@@ -1,5 +1,6 @@
 import { ExpirationCompleteEvent, Listener, OrderStatus, Subjects } from '@js-ticketing-ms/common';
 import { Message } from 'node-nats-streaming';
+
 import { Order } from '../../models/order';
 import { OrderCancelledPublisher } from '../publishers/order-cancelled-publisher';
 import { queueGroupName } from './queue-group-name';
