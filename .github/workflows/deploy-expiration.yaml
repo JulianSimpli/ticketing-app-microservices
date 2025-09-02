@@ -18,7 +18,7 @@ jobs:
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
       - run: cd expiration && docker build -t simplijulian/ticketing-ms-expiration .
       - run: docker push simplijulian/ticketing-ms-expiration
-      - uses: digitalocean/action-doctl@v3
+      - uses: digitalocean/action-doctl@v2
         with:
           token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
       - run: doctl kubernetes cluster kubeconfig save ticketing

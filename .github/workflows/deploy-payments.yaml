@@ -18,7 +18,7 @@ jobs:
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
       - run: cd payments && docker build -t simplijulian/ticketing-ms-payments .
       - run: docker push simplijulian/ticketing-ms-payments
-      - uses: digitalocean/action-doctl@v3
+      - uses: digitalocean/action-doctl@v2
         with:
           token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
       - run: doctl kubernetes cluster kubeconfig save ticketing

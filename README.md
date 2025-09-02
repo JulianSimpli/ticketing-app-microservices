@@ -1,46 +1,84 @@
-# Ticketing Microservices App
+# 🎫 Ticketing Microservices Platform
 
-This project is a ticketing application built using a microservices architecture.
+Distributed ticket selling system built with **microservices** architecture using **Node.js**, **TypeScript**, **MongoDB** and **Kubernetes**.
 
-## Tech Stack
+## 🏗️ Architecture
 
-- **Frontend:** React (Next.js)
-- **Backend:** Multiple Node.js services (TypeScript)
-- **Database:** MongoDB
-- **Authentication:** JWT (stored in cookies)
-- **Containerization & Orchestration:** Docker & Kubernetes
-- **Development Workflow:** Skaffold
-- **Deployment:** Local or Google Cloud Build
+**5 Independent Microservices:**
+- **Auth** - JWT authentication + user registration/login
+- **Tickets** - Ticket CRUD with optimistic concurrency control
+- **Orders** - Order management with automatic expiration (15 min)
+- **Payments** - Payment processing with **Stripe**
+- **Expiration** - Expiration jobs using **Bull Queue** + **Redis**
 
-## Architecture Overview
+**Frontend:** Next.js with SSR and Bootstrap
 
-- **Microservices:** Each core domain (e.g., Auth, Tickets, Orders) is implemented as a separate Node.js service.
-- **Frontend:** A Next.js app communicates with backend services via REST APIs.
-- **Auth Service:** Handles user authentication using JWTs, with tokens stored securely in cookies
+## 🔧 Tech Stack
 
-## Local Development
+- **Backend:** Node.js + TypeScript + Express
+- **Frontend:** Next.js + React + Bootstrap
+- **Database:** MongoDB (one instance per service)
+- **Message Broker:** NATS Streaming Server (event-driven)
+- **Queue:** Bull + Redis (for expiration jobs)
+- **Payments:** Stripe API
+- **Orchestration:** Kubernetes + Skaffold
+- **CI/CD:** GitHub Actions + Docker Hub
 
-1. **Prerequisites:** Docker, Kubernetes (e.g., Docker Desktop or Minikube), Skaffold, and Node.js.
-2. **Start Services:** Use Skaffold to build and deploy all services locally:
+## 🚀 Quick Setup
 
+### Prerequisites
 ```bash
-skaffold dev
+# Install dependencies
+kubectl, docker, skaffold
 ```
 
-3. **Access the App:** The frontend will be available at the configured Kubernetes ingress URL.
+### Required Environment Variables
+```bash
+# Kubernetes secrets
+JWT_KEY=<random-string>
+STRIPE_KEY=<stripe-secret-key>
+```
 
-## Deployment
+### Local Development
+```bash
+# 1. Add local host
+echo "127.0.0.1 ticketing.dev" >> /etc/hosts
 
-- **Kubernetes:** All services are containerized and managed via Kubernetes manifests.
-- **Google Cloud Build:** Optionally, you can automate builds and deployments using Google Cloud Build.
+# 2. Create k8s secrets
+kubectl create secret generic jwt-secret --from-literal=JWT_KEY=asdf
+kubectl create secret generic stripe-secret --from-literal=STRIPE_KEY=sk_test_...
 
-## Auth Module
+# 3. Start with Skaffold
+skaffold dev
 
-- **Database:** MongoDB
-- **Authentication:** JWTs issued on login/signup, stored in HTTP-only cookies for security.
+# 4. Access the app
+open https://ticketing.dev
+```
 
-## Future Plans
+## 📡 Event-Driven Communication
 
-- Implement additional services (e.g., Tickets, Orders, Payments)
-- Add CI/CD pipelines
-- Enhance security and monitoring
+**Main Events:**
+- `TicketCreated/Updated` - Synchronization between tickets and orders
+- `OrderCreated/Cancelled` - Coordinates reservations and payments
+- `PaymentCreated` - Confirms order after successful payment
+- `ExpirationComplete` - Cancels expired orders
+
+## 🔒 Key Features
+
+- **Optimistic Concurrency Control** with versioning
+- **Event sourcing** for inter-service communication
+- **Automatic order expiration** (15 minutes)
+- **Per-service database isolation**
+- **JWT authentication** with cookies
+- **Comprehensive testing** (Jest + Supertest)
+- **Docker containerization** + Kubernetes deployment
+
+## 🌐 Endpoints
+
+```
+https://ticketing.dev/api/users    - Auth service
+https://ticketing.dev/api/tickets  - Tickets service  
+https://ticketing.dev/api/orders   - Orders service
+https://ticketing.dev/api/payments - Payments service
+https://ticketing.dev/             - Client (Next.js)
+```
